@@ -1,0 +1,35 @@
+version: "3.1"
+
+services:
+
+  mongo:
+    build:
+      context: mongo
+      dockerfile: Dockerfile
+    image: mongorpl
+    hostname: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+
+  todo-list-application:
+    build:
+      context: ../todo-list-application
+    depends_on:
+      - mongo
+    image: todo-list-application
+    ports:
+      - "8080:8080"
+    environment:
+      - spring.data.mongodb.uri=mongodb://mongo:27017/todolist
+
+volumes:
+  mongo-data:
