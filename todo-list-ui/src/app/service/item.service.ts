@@ -17,6 +17,14 @@ export class ItemService {
     this.baseUrl = `${environment.apiUrl}/items`;
   }
 
+  private static buildOptionsIfMatch(version: number) {
+    return {
+      headers: new HttpHeaders({
+        'if-match': String(version)
+      })
+    };
+  }
+
   findAll(): Observable<Item> {
     return new Observable<Item>((observer) => {
       this.handleMessageEvent(new EventSource(this.baseUrl ), observer);
@@ -50,14 +58,6 @@ export class ItemService {
     return this.http.patch<void>(`${this.baseUrl}/${id}`, {status}, ItemService.buildOptionsIfMatch(version));
   }
 
-  private static buildOptionsIfMatch(version: number) {
-    return {
-      headers: new HttpHeaders({
-        'if-match': String(version)
-      })
-    };
-  }
-
   private handleMessageEvent(eventSource: EventSource, observer: Subscriber<any>, keepAlive = false) {
     eventSource.onmessage = (event) => {
       const item = JSON.parse(event.data);
@@ -72,7 +72,6 @@ export class ItemService {
         if (! keepAlive) {
           eventSource.close();
           observer.complete();
-          console.info(message);
         } else {
           console.error(message);
         }
