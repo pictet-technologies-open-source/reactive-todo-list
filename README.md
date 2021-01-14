@@ -1,3 +1,4 @@
+[![CircleCI](https://circleci.com/gh/pictet-technologies-open-source/reactive-todo-list/tree/main.svg?style=shield&circle-token=90b39e6ac2420e2e4e4991cc34325c1ca74fa263)](https://circleci.com/gh/pictet-technologies-open-source/reactive-todo-list)
 [![CodeFactor](https://www.codefactor.io/repository/github/pictet-technologies-open-source/reactive-todo-list/badge?s=88d8b4d1338a9d7d41b62e825d1f2d1a61fe6ee4)](https://www.codefactor.io/repository/github/pictet-technologies-open-source/reactive-todo-list)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
