@@ -31,14 +31,4 @@ build/
 
 ### VS Code ###
 .vscode/
-/todo-list-application/src/main/webapp/dist/3rdpartylicenses.txt
-/todo-list-application/src/main/webapp/dist/favicon.ico
-/todo-list-application/src/main/webapp/dist/index.html
-/todo-list-application/src/main/webapp/dist/main-es5.f7476559dd44034653ca.js
-/todo-list-application/src/main/webapp/dist/main-es2015.f7476559dd44034653ca.js
-/todo-list-application/src/main/webapp/dist/polyfills-es5.177e85a9724683782539.js
-/todo-list-application/src/main/webapp/dist/polyfills-es2015.f332a089ad1600448873.js
-/todo-list-application/src/main/webapp/dist/runtime-es5.0dae8cbc97194c7caed4.js
-/todo-list-application/src/main/webapp/dist/runtime-es2015.0dae8cbc97194c7caed4.js
-/todo-list-application/src/main/webapp/dist/styles.8039fd8c3c8d4eb5af23.css
 /todo-list-application/src/main/webapp/dist/
