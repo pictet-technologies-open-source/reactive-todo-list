@@ -1,4 +1,7 @@
-# Todo List 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+
+# Reactive Todo List 
 
 This project aims to explain how to build a fully reactive application with Spring Boot, Spring Webflux, Angular and MongoDB.
 It demonstrates how to deal with concurrent modifications using optimistic locking and Server Sent Events.
