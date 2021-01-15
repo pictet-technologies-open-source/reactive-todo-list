@@ -30,8 +30,8 @@ export class ItemComponent {
   delete() {
     this.actionInProgress = true;
 
-    this.itemService.delete(this.item.id, this.item.version).pipe(take(1),
-      finalize(() => this.actionInProgress = false)).subscribe(() => {
+    this.itemService.delete(this.item.id, this.item.version)
+      .pipe(finalize(() => this.actionInProgress = false)).subscribe(() => {
       this.itemDeleted.emit();
     });
   }
@@ -48,7 +48,7 @@ export class ItemComponent {
     dialogRef.afterClosed().pipe(take(1)).subscribe((response) => {
       if (response) {
         this.itemService.updateDescription(this.item.id, this.item.version, response)
-          .pipe(take(1), finalize(() => this.actionInProgress = false))
+          .pipe(finalize(() => this.actionInProgress = false))
           .subscribe(() => {
             this.itemUpdated.emit();
           });

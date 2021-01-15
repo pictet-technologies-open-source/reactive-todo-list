@@ -74,7 +74,7 @@ export class ItemBoardComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().pipe(take(1)).subscribe((response) => {
       if (response) {
         this.itemService.addItem(response)
-          .pipe(take(1), finalize(() => this.stopActionInProgress()))
+          .pipe(finalize(() => this.stopActionInProgress()))
           .subscribe(() => {
           });
       } else {
@@ -101,7 +101,7 @@ export class ItemBoardComponent implements OnInit, OnDestroy {
 
       // Update the status of the dropped item
       this.itemService.updateStatus(item.id, item.version, newStatus)
-        .pipe(take(1), finalize(() => this.stopActionInProgress()))
+        .pipe(finalize(() => this.stopActionInProgress()))
         .subscribe(() => {
         });
     }
