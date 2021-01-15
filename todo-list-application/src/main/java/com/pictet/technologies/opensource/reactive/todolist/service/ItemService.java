@@ -79,11 +79,12 @@ public class ItemService {
         return findItemById(id, version)
                 .flatMap(item -> {
                     if (itemPatchResource.getDescription() != null) {
-                        item.setDescription(itemPatchResource.getDescription().orElse(null));
+                        // The description has been provided in the patch
+                        item.setDescription(itemPatchResource.getDescription().get());
                     }
 
                     if (itemPatchResource.getStatus() != null) {
-                        // No need to test is present here
+                        // The status has been provided in the patch
                         item.setStatus(itemPatchResource.getStatus().get());
                     }
                     return itemRepository.save(item);
