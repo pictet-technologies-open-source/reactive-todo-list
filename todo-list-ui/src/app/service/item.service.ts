@@ -5,7 +5,7 @@ import {Observable, Subscriber} from 'rxjs';
 import {ItemStatus} from '../model/item-status.enum';
 import {environment} from '../../environments/environment';
 import {EventMessage} from '../model/event-message';
-import {take} from "rxjs/operators";
+import {take} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
