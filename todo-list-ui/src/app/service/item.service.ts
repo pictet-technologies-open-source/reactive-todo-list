@@ -27,8 +27,8 @@ export class ItemService {
   }
 
   findAll(): Observable<Item> {
-    return new Observable<Item>((observer) => {
-      this.handleMessageEvent(new EventSource(this.baseUrl ), observer);
+    return new Observable<Item>((subscriber) => {
+      this.handleMessageEvent(new EventSource(this.baseUrl), subscriber);
     });
   }
 
@@ -64,25 +64,24 @@ export class ItemService {
       .pipe(take(1));
   }
 
-  private handleMessageEvent(eventSource: EventSource, observer: Subscriber<any>, keepAlive = false) {
+  private handleMessageEvent(eventSource: EventSource, subscriber: Subscriber<any>, keepAlive = false) {
     eventSource.onmessage = (event) => {
       const item = JSON.parse(event.data);
-      this.ngZone.run(() => observer.next(item));
+      this.ngZone.run(() => subscriber.next(item));
     };
 
     eventSource.onerror = (error) => {
 
       if (eventSource.readyState === 0) {
 
-        const message = 'Stream closed';
         if (! keepAlive) {
           eventSource.close();
-          observer.complete();
+          subscriber.complete();
         } else {
-          console.error(message);
+          console.error('Stream closed');
         }
       } else {
-        observer.error(error);
+        subscriber.error(error);
       }
     };
   }
