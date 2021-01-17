@@ -6,7 +6,7 @@ import com.pictet.technologies.opensource.reactive.todolist.api.ItemUpdateResour
 import com.pictet.technologies.opensource.reactive.todolist.api.NewItemResource;
 import com.pictet.technologies.opensource.reactive.todolist.api.event.EventMessage;
 import com.pictet.technologies.opensource.reactive.todolist.exception.ItemNotFoundException;
-import com.pictet.technologies.opensource.reactive.todolist.exception.ItemUnexpectedVersionException;
+import com.pictet.technologies.opensource.reactive.todolist.exception.UnexpectedItemVersionException;
 import com.pictet.technologies.opensource.reactive.todolist.mapper.ItemMapper;
 import com.pictet.technologies.opensource.reactive.todolist.model.Item;
 import com.pictet.technologies.opensource.reactive.todolist.repository.ItemRepository;
@@ -105,7 +105,7 @@ public class ItemService {
      * @param expectedVersion Expected version of the item (optional)
      * @return the item mono
      * @throws ItemNotFoundException          if the item with the provided Id does not exist
-     * @throws ItemUnexpectedVersionException if the item has a different version
+     * @throws UnexpectedItemVersionException if the item has a different version
      */
     private Mono<Item> findItemById(final String id, final Long expectedVersion) {
 
@@ -113,7 +113,7 @@ public class ItemService {
                 .switchIfEmpty(Mono.error(new ItemNotFoundException(id)))
                 .handle((item, sink) -> {
                     if (expectedVersion != null && !expectedVersion.equals(item.getVersion())) {
-                        sink.error((new ItemUnexpectedVersionException(expectedVersion, item.getVersion())));
+                        sink.error((new UnexpectedItemVersionException(expectedVersion, item.getVersion())));
                     } else {
                         sink.next(item);
                     }
