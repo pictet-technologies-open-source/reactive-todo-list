@@ -113,7 +113,7 @@ public class ItemService {
                 .switchIfEmpty(Mono.error(new ItemNotFoundException(id)))
                 .handle((item, sink) -> {
                     if (expectedVersion != null && !expectedVersion.equals(item.getVersion())) {
-                        sink.error((new UnexpectedItemVersionException(expectedVersion, item.getVersion())));
+                        sink.error(new UnexpectedItemVersionException(expectedVersion, item.getVersion()));
                     } else {
                         sink.next(item);
                     }
