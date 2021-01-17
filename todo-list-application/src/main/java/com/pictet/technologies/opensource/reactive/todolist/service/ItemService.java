@@ -60,7 +60,7 @@ public class ItemService {
                 .build();
 
         return reactiveMongoTemplate.changeStream("item", changeStreamOptions, Item.class)
-                .map(itemMapper::toEventWrapper);
+                .map(itemMapper::toEventMessage);
     }
 
     public Mono<ItemResource> update(final String id, final Long version, final ItemUpdateResource itemUpdateResource) {

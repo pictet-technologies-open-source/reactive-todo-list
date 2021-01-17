@@ -31,7 +31,7 @@ public interface ItemMapper {
     @Mapping(target = "version", ignore = true)
     void update(ItemUpdateResource updateResource, @MappingTarget Item item);
 
-    default EventMessage toEventWrapper(ChangeStreamEvent<Item> event) {
+    default EventMessage toEventMessage(ChangeStreamEvent<Item> event) {
 
         if(event.getOperationType() == null) {
             return null;

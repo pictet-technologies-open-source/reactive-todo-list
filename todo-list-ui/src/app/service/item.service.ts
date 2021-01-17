@@ -18,7 +18,7 @@ export class ItemService {
     this.baseUrl = `${environment.apiUrl}/items`;
   }
 
-  private static buildOptionsIfMatch(version: number) {
+  private static buildOptions(version: number) {
     return {
       headers: new HttpHeaders({
         'if-match': String(version)
@@ -50,17 +50,17 @@ export class ItemService {
   }
 
   delete(id: string, version: number): Observable<any> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`, ItemService.buildOptionsIfMatch(version))
+    return this.http.delete<void>(`${this.baseUrl}/${id}`, ItemService.buildOptions(version))
       .pipe(take(1));
   }
 
   updateDescription(id: string, version: number, description: string) {
-    return this.http.patch<void>(`${this.baseUrl}/${id}`, {description}, ItemService.buildOptionsIfMatch(version))
+    return this.http.patch<void>(`${this.baseUrl}/${id}`, {description}, ItemService.buildOptions(version))
       .pipe(take(1));
   }
 
   updateStatus(id: string, version: number, status: ItemStatus) {
-    return this.http.patch<void>(`${this.baseUrl}/${id}`, {status}, ItemService.buildOptionsIfMatch(version))
+    return this.http.patch<void>(`${this.baseUrl}/${id}`, {status}, ItemService.buildOptions(version))
       .pipe(take(1));
   }
 
