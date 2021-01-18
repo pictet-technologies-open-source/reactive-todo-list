@@ -43,13 +43,13 @@ public class ItemRepositoryIntegrationTest {
 
         assertEquals(1, existingItem.getVersion());
 
-        // When
+        // When / Then
         final Item itemToUpdate = new Item().setId(existingItem.getId())
                 .setVersion(0L)
                 .setDescription("Walk the dog by the river");
 
             assertThrows(OptimisticLockingFailureException.class, () -> {
-            itemRepository.save(itemToUpdate).block();
+              itemRepository.save(itemToUpdate).block();
         });
     }
 
