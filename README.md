@@ -7,7 +7,7 @@
 # Reactive Todo List 
 
 This project aims to explain how to build a fully reactive application with Spring Boot, Spring Webflux, Angular and MongoDB.
-It demonstrates how to deal with concurrent modifications using optimistic locking and Server Sent Events.
+It demonstrates how to deal with concurrent modifications using optimistic locking, Change Streams and Server Sent Events.
 
 <p align="center">
 <img width="60%" height="60%" src="https://lh3.googleusercontent.com/sqUKGUFVt4qwAAEqTJk_eycuj00imob1MtSVMFQ-6H_bPXEQmD84xw8TdOzqDxUD16ToclYrVnxRot4IsUq8bRFcUrOl_MA3yoCmSDRWWVB4UfmVv7dG7H_PJIqyWfqTrkkYJUemi_E=w1920-h1080">
