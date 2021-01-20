@@ -76,7 +76,7 @@ public class ItemController {
         return itemService.update(id, version, itemUpdateResource);
     }
 
-    @ApiOperation("Patch an existing item following the patch merge RCF (https://tools.ietf.org/html/rfc7386)")
+    @ApiOperation("Patch an existing item following the patch merge RCF (https://tools.ietf.org/html/rfc7396)")
     @PatchMapping(value = "/{id}")
     public Mono<ItemResource> update(@PathVariable @NotNull final String id,
                                      @RequestHeader(name = IF_MATCH, required = false) Long version,
