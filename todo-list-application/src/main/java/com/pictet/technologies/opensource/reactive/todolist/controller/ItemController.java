@@ -45,7 +45,7 @@ public class ItemController {
 
         Flux<EventMessage> eventMessageFlux = itemService.listenToEvents();
 
-        // Send a heart beart every x ms to keep the connection alive
+        // Send a heart beat every x ms to keep the connection alive
         if(sseConfig.getHeartBeatDelayMs() > 0) {
             log.info("Send a heart beat every {}ms ", sseConfig.getHeartBeatDelayMs());
             final Flux<EventMessage> beats = Flux.interval(Duration.ofMillis(sseConfig.getHeartBeatDelayMs()))
