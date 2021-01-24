@@ -17,7 +17,7 @@ import {EventMessage} from '../model/event-message';
 })
 export class ItemBoardComponent implements OnInit, OnDestroy {
 
-  private $eventObservable: Subscription;
+  private eventMessageSubscription: Subscription;
 
   ItemStatus = ItemStatus;
   statusItemsMap = new Map<string, Item[]>();
@@ -33,13 +33,13 @@ export class ItemBoardComponent implements OnInit, OnDestroy {
     this.refresh();
 
     // Listen to all changes
-    this.$eventObservable = this.itemService.listenToEvents().subscribe((message) => {
+    this.eventMessageSubscription = this.itemService.listenToEvents().subscribe((message) => {
       this.handleEvent(message);
     });
   }
 
   ngOnDestroy(): void {
-    this.$eventObservable.unsubscribe();
+    this.eventMessageSubscription.unsubscribe();
   }
 
   refresh() {
