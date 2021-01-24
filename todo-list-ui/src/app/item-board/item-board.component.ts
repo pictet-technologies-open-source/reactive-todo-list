@@ -33,8 +33,8 @@ export class ItemBoardComponent implements OnInit, OnDestroy {
     this.refresh();
 
     // Listen to all changes
-    this.$eventObservable = this.itemService.listenToEvents().subscribe((itemEvent) => {
-      this.handleEvent(itemEvent);
+    this.$eventObservable = this.itemService.listenToEvents().subscribe((message) => {
+      this.handleEvent(message);
     });
   }
 
@@ -124,11 +124,11 @@ export class ItemBoardComponent implements OnInit, OnDestroy {
     this.dragAndDropInProgress = false;
   }
 
-  private handleEvent(eventWrapper: EventMessage) {
+  private handleEvent(eventMessage: EventMessage) {
 
-    const receivedEvent = eventWrapper.event;
+    const receivedEvent = eventMessage.event;
 
-    switch (eventWrapper.eventType) {
+    switch (eventMessage.eventType) {
       case 'ItemDeleted':
         this.removeItem(receivedEvent.itemId);
         break;
