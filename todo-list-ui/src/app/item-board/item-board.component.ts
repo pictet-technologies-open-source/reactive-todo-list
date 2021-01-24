@@ -140,8 +140,8 @@ export class ItemBoardComponent implements OnInit, OnDestroy {
         this.statusItemsMap.get(item.status).push(item);
         break;
 
-      case 'PingEvent':
-        console.log('Ping received from sever');
+      case 'HeartBeat':
+        // Heart Beat received
         break;
 
       default:
