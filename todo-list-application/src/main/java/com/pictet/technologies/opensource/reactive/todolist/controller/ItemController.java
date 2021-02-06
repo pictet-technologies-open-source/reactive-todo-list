@@ -4,7 +4,7 @@ import com.pictet.technologies.opensource.reactive.todolist.api.ItemPatchResourc
 import com.pictet.technologies.opensource.reactive.todolist.api.ItemResource;
 import com.pictet.technologies.opensource.reactive.todolist.api.ItemUpdateResource;
 import com.pictet.technologies.opensource.reactive.todolist.api.NewItemResource;
-import com.pictet.technologies.opensource.reactive.todolist.api.event.EventMessage;
+import com.pictet.technologies.opensource.reactive.todolist.api.event.Event;
 import com.pictet.technologies.opensource.reactive.todolist.api.event.HeartBeat;
 import com.pictet.technologies.opensource.reactive.todolist.config.ServerSentEventConfig;
 import com.pictet.technologies.opensource.reactive.todolist.service.ItemService;
@@ -41,22 +41,22 @@ public class ItemController {
 
     @ApiOperation("Get the item event stream")
     @GetMapping(value = "events", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ServerSentEvent<EventMessage>> getEventStream() {
+    public Flux<ServerSentEvent<Event>> getEventStream() {
 
-        Flux<EventMessage> eventMessageFlux = itemService.listenToEvents();
+        Flux<Event> eventMessageFlux = itemService.listenToEvents();
 
         // Send a heart beat every x ms to keep the connection alive
         if(sseConfig.getHeartBeatDelayMs() > 0) {
             log.info("Send a heart beat every {}ms ", sseConfig.getHeartBeatDelayMs());
-            final Flux<EventMessage> beats = Flux.interval(Duration.ofMillis(sseConfig.getHeartBeatDelayMs()))
-                .map(sequence -> new EventMessage(HeartBeat.class.getSimpleName(),
-                        new HeartBeat()));
+            final Flux<Event> beats = Flux.interval(Duration.ofMillis(sseConfig.getHeartBeatDelayMs()))
+                .map(sequence -> new HeartBeat());
             eventMessageFlux = Flux.merge(beats, eventMessageFlux);
         }
 
         return eventMessageFlux
-                .map(event -> ServerSentEvent.<EventMessage>builder()
+                .map(event -> ServerSentEvent.<Event>builder()
                     .retry(Duration.ofMillis(sseConfig.getReconnectionDelayMs()))
+                    .event(event.getClass().getSimpleName())
                     .data(event).build())
                 .doFinally(signal -> log.info("Item event stream - {}", signal));
     }

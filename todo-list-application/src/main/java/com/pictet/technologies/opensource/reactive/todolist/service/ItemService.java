@@ -1,16 +1,16 @@
 package com.pictet.technologies.opensource.reactive.todolist.service;
 
+import com.mongodb.client.model.changestream.OperationType;
 import com.pictet.technologies.opensource.reactive.todolist.api.ItemPatchResource;
 import com.pictet.technologies.opensource.reactive.todolist.api.ItemResource;
 import com.pictet.technologies.opensource.reactive.todolist.api.ItemUpdateResource;
 import com.pictet.technologies.opensource.reactive.todolist.api.NewItemResource;
-import com.pictet.technologies.opensource.reactive.todolist.api.event.EventMessage;
+import com.pictet.technologies.opensource.reactive.todolist.api.event.Event;
 import com.pictet.technologies.opensource.reactive.todolist.exception.ItemNotFoundException;
 import com.pictet.technologies.opensource.reactive.todolist.exception.UnexpectedItemVersionException;
 import com.pictet.technologies.opensource.reactive.todolist.mapper.ItemMapper;
 import com.pictet.technologies.opensource.reactive.todolist.model.Item;
 import com.pictet.technologies.opensource.reactive.todolist.repository.ItemRepository;
-import com.mongodb.client.model.changestream.OperationType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ChangeStreamOptions;
@@ -48,7 +48,7 @@ public class ItemService {
                 .map(itemMapper::toResource);
     }
 
-    public Flux<EventMessage> listenToEvents() {
+    public Flux<Event> listenToEvents() {
         final ChangeStreamOptions changeStreamOptions = ChangeStreamOptions.builder()
                 .returnFullDocumentOnUpdate()
                 .filter(Aggregation.newAggregation(ItemResource.class,
@@ -60,7 +60,7 @@ public class ItemService {
                 .build();
 
         return reactiveMongoTemplate.changeStream("item", changeStreamOptions, Item.class)
-                .map(itemMapper::toEventMessage);
+                .map(itemMapper::toEvent);
     }
 
     public Mono<ItemResource> update(final String id, final Long version, final ItemUpdateResource itemUpdateResource) {

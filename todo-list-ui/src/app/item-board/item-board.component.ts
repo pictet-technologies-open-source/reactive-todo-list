@@ -6,9 +6,7 @@ import {MatDialog} from '@angular/material/dialog';
 import {CdkDragDrop, transferArrayItem} from '@angular/cdk/drag-drop';
 import {ItemSaveDialogComponent} from '../item-save-dialog/item-save-dialog.component';
 import {MapUtils} from '../utils/map-utils';
-import {Subscription} from 'rxjs';
 import {Item} from '../model/item';
-import {EventMessage} from '../model/event-message';
 
 @Component({
   selector: 'app-item-board',
@@ -17,7 +15,7 @@ import {EventMessage} from '../model/event-message';
 })
 export class ItemBoardComponent implements OnInit, OnDestroy {
 
-  private eventMessageSubscription: Subscription;
+  private eventSource: EventSource;
 
   ItemStatus = ItemStatus;
   statusItemsMap = new Map<string, Item[]>();
@@ -31,19 +29,29 @@ export class ItemBoardComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.refresh();
-
-    // Listen to all changes
-    this.eventMessageSubscription = this.itemService.listenToEvents().subscribe((message) => {
-      this.handleEvent(message);
-    });
+    this.startEventListener();
   }
 
   ngOnDestroy(): void {
-    this.eventMessageSubscription.unsubscribe();
+    this.stopEventListener();
   }
 
-  refresh() {
+  //---------------------------------------------------------------------------------------
+  // Enable this code to solve the issue of the maximum number of SSE
+  // Drawback: data modifications are visible only when the user has the focus on the tab
+  //---------------------------------------------------------------------------------------
+  // @HostListener('window:focus', ['$event'])
+  // onFocus(event: any): void {
+  //   this.refresh();
+  //   this.startEventListener();
+  // }
+  //
+  // @HostListener('window:blur', ['$event'])
+  // onBlur(event: any): void {
+  //   this.stopEventListener();
+  // }
 
+  refresh() {
     this.actionInProgress = true;
 
     for (const status of this.getStatuses()) {
@@ -124,29 +132,15 @@ export class ItemBoardComponent implements OnInit, OnDestroy {
     this.dragAndDropInProgress = false;
   }
 
-  private handleEvent(eventMessage: EventMessage) {
+  onItemDeleted(event: any) {
+    this.removeItem(event.itemId);
+  }
 
-    const receivedEvent = eventMessage.event;
-
-    switch (eventMessage.eventType) {
-      case 'ItemDeleted':
-        this.removeItem(receivedEvent.itemId);
-        break;
-
-      case 'ItemSaved':
-        const item = receivedEvent.item;
-        this.removeItem(item.id);
-        // Add it to the correct status column
-        this.statusItemsMap.get(item.status).push(item);
-        break;
-
-      case 'HeartBeat':
-        // Heart Beat received
-        break;
-
-      default:
-        console.error('Unsupported event received: ' + receivedEvent);
-    }
+  onItemSaved(event: any) {
+     const item = event.item;
+     this.removeItem(item.id);
+     // Add it to the correct status column
+     this.statusItemsMap.get(item.status).push(item);
   }
 
   private removeItem(itemId: string) {
@@ -158,4 +152,16 @@ export class ItemBoardComponent implements OnInit, OnDestroy {
       }
     }
   }
+
+  private startEventListener() {
+    // Listen to all changes
+    this.eventSource = this.itemService.listenToEvents(
+      (e) => this.onItemSaved(e),
+      (e) => this.onItemDeleted(e));
+  }
+
+  private stopEventListener() {
+    this.eventSource.close();
+  }
+
 }
