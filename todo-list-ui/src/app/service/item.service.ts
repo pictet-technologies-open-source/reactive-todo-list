@@ -13,7 +13,7 @@ export class ItemService {
 
   readonly baseUrl;
 
-  constructor(private readonly http: HttpClient, private readonly ngZone: NgZone) {
+  constructor(private readonly http: HttpClient) {
     this.baseUrl = `${environment.apiUrl}/items`;
   }
 
@@ -30,10 +30,10 @@ export class ItemService {
 
       const eventSource = new EventSource(this.baseUrl);
 
-      // Process incoming message
+      // Process incoming messages
       eventSource.onmessage = (event) => {
         const item = JSON.parse(event.data);
-        this.ngZone.run(() => subscriber.next(item));
+        subscriber.next(item);
       };
 
       // Handle error
@@ -74,16 +74,16 @@ export class ItemService {
       .pipe(take(1));
   }
 
-  listenToEvents(onSaved: (any) => void, onDeleted: (any) => void): EventSource {
+  listenToEvents(onSaved: (event) => void, onDeleted: (event) => void): EventSource {
     const eventSource = new EventSource(`${this.baseUrl}/events`);
 
     // Handle the creation and the update of items
-    eventSource.addEventListener('ItemSaved', function(event: MessageEvent) {
+    eventSource.addEventListener('ItemSaved', (event: MessageEvent) => {
       onSaved(JSON.parse(event.data));
     });
 
     // Handle the deletion of items
-    eventSource.addEventListener('ItemDeleted', function(event: MessageEvent) {
+    eventSource.addEventListener('ItemDeleted', (event: MessageEvent) => {
       onDeleted(JSON.parse(event.data));
     });
 
@@ -96,7 +96,7 @@ export class ItemService {
       } else {
         console.error(error);
       }
-    }
+    };
 
     return eventSource;
   }
