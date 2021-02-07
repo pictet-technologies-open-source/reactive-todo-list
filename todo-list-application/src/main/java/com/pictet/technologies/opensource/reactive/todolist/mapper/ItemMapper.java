@@ -32,11 +32,7 @@ public interface ItemMapper {
     void update(ItemUpdateResource updateResource, @MappingTarget Item item);
 
     default Event toEvent(final ChangeStreamEvent<Item> changeStreamEvent) {
-
-        if(changeStreamEvent.getOperationType() == null) {
-            return null;
-        }
-
+        
         final Event event;
 
         switch (changeStreamEvent.getOperationType()) {

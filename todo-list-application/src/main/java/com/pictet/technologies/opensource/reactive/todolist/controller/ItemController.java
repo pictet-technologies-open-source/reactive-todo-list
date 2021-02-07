@@ -40,7 +40,7 @@ public class ItemController {
     }
 
     @ApiOperation("Get the item event stream")
-    @GetMapping(value = "events", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "events")
     public Flux<ServerSentEvent<Event>> getEventStream() {
 
         Flux<Event> eventMessageFlux = itemService.listenToEvents();
