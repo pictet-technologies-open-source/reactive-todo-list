@@ -13,7 +13,7 @@ export class ItemService {
 
   readonly baseUrl;
 
-  constructor(private readonly http: HttpClient) {
+  constructor(private readonly http: HttpClient, private readonly ngZone: NgZone) {
     this.baseUrl = `${environment.apiUrl}/items`;
   }
 
@@ -33,7 +33,7 @@ export class ItemService {
       // Process incoming messages
       eventSource.onmessage = (event) => {
         const item = JSON.parse(event.data);
-        subscriber.next(item);
+        this.ngZone.run(() => subscriber.next(item));
       };
 
       // Handle error

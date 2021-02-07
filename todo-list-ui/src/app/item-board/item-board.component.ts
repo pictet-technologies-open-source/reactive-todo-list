@@ -54,15 +54,17 @@ export class ItemBoardComponent implements OnInit, OnDestroy {
   refresh() {
     this.actionInProgress = true;
 
-    for (const status of this.getStatuses()) {
-      this.statusItemsMap.set(status, []);
-    }
-
     this.itemService.findAll()
       .pipe(finalize(() => {
         this.stopActionInProgress();
       }))
       .subscribe(item => {
+
+        // Clear all statuses
+        for (const status of this.getStatuses()) {
+          this.statusItemsMap.set(status, []);
+        }
+
         this.statusItemsMap.get(item.status).push(item);
       });
   }
