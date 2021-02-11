@@ -49,7 +49,7 @@ export class ItemService {
     });
   }
 
-  addItem(description: string): Observable<Item[]> {
+  addItem(description: string): Observable<any> {
     return this.http.post<Item[]>(this.baseUrl, {description})
       .pipe(take(1));
   }
@@ -64,12 +64,12 @@ export class ItemService {
       .pipe(take(1));
   }
 
-  updateDescription(id: string, version: number, description: string) {
+  updateDescription(id: string, version: number, description: string): Observable<any> {
     return this.http.patch<void>(`${this.baseUrl}/${id}`, {description}, ItemService.buildOptions(version))
       .pipe(take(1));
   }
 
-  updateStatus(id: string, version: number, status: ItemStatus) {
+  updateStatus(id: string, version: number, status: ItemStatus): Observable<any> {
     return this.http.patch<void>(`${this.baseUrl}/${id}`, {status}, ItemService.buildOptions(version))
       .pipe(take(1));
   }
