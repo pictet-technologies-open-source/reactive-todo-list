@@ -85,8 +85,7 @@ export class ItemBoardComponent implements OnInit, OnDestroy {
       if (response) {
         this.itemService.addItem(response)
           .pipe(finalize(() => this.stopActionInProgress()))
-          .subscribe(() => {
-          });
+          .subscribe();
       } else {
         this.stopActionInProgress();
       }
@@ -112,8 +111,7 @@ export class ItemBoardComponent implements OnInit, OnDestroy {
       // Update the status of the dropped item
       this.itemService.updateStatus(item.id, item.version, newStatus)
         .pipe(finalize(() => this.stopActionInProgress()))
-        .subscribe(() => {
-        });
+        .subscribe();
     }
   }
 
@@ -134,13 +132,14 @@ export class ItemBoardComponent implements OnInit, OnDestroy {
     this.dragAndDropInProgress = false;
   }
 
-  onItemDeleted(event: any) {
+  private onItemDeleted(event: any) {
     this.removeItem(event.itemId);
   }
 
-  onItemSaved(event: any) {
+  private onItemSaved(event: any) {
      const item = event.item;
      this.removeItem(item.id);
+
      // Add it to the correct status column
      this.statusItemsMap.get(item.status).push(item);
   }
