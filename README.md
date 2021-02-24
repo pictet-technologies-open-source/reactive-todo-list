@@ -6,7 +6,7 @@
 
 # Reactive Todo List 
 
-This project aims to explain how to build a fully reactive application with Spring Boot, Spring Webflux, Angular and MongoDB.
+This project aims to explain how to build a fully reactive web application with Spring Boot, Spring WebFlux, Angular and MongoDB.
 It demonstrates how to deal with concurrent modifications using optimistic locking, Change Streams and Server Sent Events.
 
 <p align="center">
