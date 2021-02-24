@@ -77,7 +77,7 @@ Ensure that the URL of the application has been correctly configured in the foll
 todo-list-ui/src/app/environments/environment.prod.ts
 ```
 
-Then build the application in production mode.
+Then build the application in production mode. To do so, go the the root folder and execute the following command.
 
 ```
 $ mvnw clean install -Pprod
