@@ -15,8 +15,6 @@ import {Item} from '../model/item';
 })
 export class ItemBoardComponent implements OnInit, OnDestroy {
 
-  private eventSource: EventSource;
-
   ItemStatus = ItemStatus;
   statusItemsMap = new Map<string, Item[]>();
   actionInProgress = false;
@@ -63,9 +61,8 @@ export class ItemBoardComponent implements OnInit, OnDestroy {
       .pipe(finalize(() => {
         this.stopActionInProgress();
       }))
-      .subscribe(item => {
-
-        this.statusItemsMap.get(item.status).push(item);
+      .subscribe(items => {
+        items.forEach(item => this.statusItemsMap.get(item.status).push(item));
       });
   }
 
@@ -84,7 +81,7 @@ export class ItemBoardComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().pipe(take(1)).subscribe((response) => {
       if (response) {
         this.itemService.addItem(response)
-          .pipe(finalize(() => this.stopActionInProgress()))
+          .pipe(finalize(() => { this.stopActionInProgress(); this.refresh(); }))
           .subscribe();
       } else {
         this.stopActionInProgress();
@@ -110,7 +107,7 @@ export class ItemBoardComponent implements OnInit, OnDestroy {
 
       // Update the status of the dropped item
       this.itemService.updateStatus(item.id, item.version, newStatus)
-        .pipe(finalize(() => this.stopActionInProgress()))
+        .pipe(finalize(() => {this.stopActionInProgress(); this.refresh();}))
         .subscribe();
     }
   }
@@ -132,18 +129,6 @@ export class ItemBoardComponent implements OnInit, OnDestroy {
     this.dragAndDropInProgress = false;
   }
 
-  private onItemDeleted(event: any) {
-    this.removeItem(event.itemId);
-  }
-
-  private onItemSaved(event: any) {
-     const item = event.item;
-     this.removeItem(item.id);
-
-     // Add it to the correct status column
-     this.statusItemsMap.get(item.status).push(item);
-  }
-
   private removeItem(itemId: string) {
     // Remove the item
     for (const items of this.statusItemsMap.values()) {
@@ -155,14 +140,11 @@ export class ItemBoardComponent implements OnInit, OnDestroy {
   }
 
   private startEventListener() {
-    // Listen to all changes
-    this.eventSource = this.itemService.listenToEvents(
-      (e) => this.onItemSaved(e),
-      (e) => this.onItemDeleted(e));
+    // TODO listen to all events
   }
 
   private stopEventListener() {
-    this.eventSource.close();
+    // TODO
   }
 
 }

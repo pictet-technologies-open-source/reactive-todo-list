@@ -25,28 +25,8 @@ export class ItemService {
     };
   }
 
-  findAll(): Observable<Item> {
-    return new Observable<Item>((subscriber) => {
-
-      const eventSource = new EventSource(this.baseUrl);
-
-      // Process incoming messages
-      eventSource.onmessage = (event) => {
-        const item = JSON.parse(event.data);
-        this.ngZone.run(() => subscriber.next(item));
-      };
-
-      // Handle error
-      eventSource.onerror = (error) => {
-        if (eventSource.readyState === 0) {
-            // The connection has been closed by the server
-            eventSource.close();
-            subscriber.complete();
-        } else {
-          subscriber.error(error);
-        }
-      };
-    });
+  findAll(): Observable<Item[]> {
+    return this.http.get<Item[]>(this.baseUrl).pipe(take(1));
   }
 
   addItem(description: string): Observable<any> {
@@ -60,46 +40,18 @@ export class ItemService {
   }
 
   delete(id: string, version: number): Observable<any> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`, ItemService.buildOptions(version))
+    return this.http.delete<void>(`${this.baseUrl}/${id}`)
       .pipe(take(1));
   }
 
   updateDescription(id: string, version: number, description: string): Observable<any> {
-    return this.http.patch<void>(`${this.baseUrl}/${id}`, {description}, ItemService.buildOptions(version))
+    return this.http.patch<void>(`${this.baseUrl}/${id}`, {description})
       .pipe(take(1));
   }
 
   updateStatus(id: string, version: number, status: ItemStatus): Observable<any> {
-    return this.http.patch<void>(`${this.baseUrl}/${id}`, {status}, ItemService.buildOptions(version))
+    return this.http.patch<void>(`${this.baseUrl}/${id}`, {status})
       .pipe(take(1));
   }
-
-  listenToEvents(onSaved: (event) => void, onDeleted: (event) => void): EventSource {
-    const eventSource = new EventSource(`${this.baseUrl}/events`);
-
-    // Handle the creation and the update of items
-    eventSource.addEventListener('ItemSaved', (event: MessageEvent) => {
-      onSaved(JSON.parse(event.data));
-    });
-
-    // Handle the deletion of items
-    eventSource.addEventListener('ItemDeleted', (event: MessageEvent) => {
-      onDeleted(JSON.parse(event.data));
-    });
-
-    // Handle errors
-    eventSource.onerror = (error) => {
-      if (eventSource.readyState === 0) {
-        // The connection has been closed
-        // We should not close the eventSource in order to allow the automatic reconnection
-        console.error('Stream closed');
-      } else {
-        console.error(error);
-      }
-    };
-
-    return eventSource;
-  }
-
 
 }

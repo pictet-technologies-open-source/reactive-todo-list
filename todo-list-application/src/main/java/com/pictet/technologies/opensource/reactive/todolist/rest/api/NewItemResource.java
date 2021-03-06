@@ -1,4 +1,4 @@
-package com.pictet.technologies.opensource.reactive.todolist.api;
+package com.pictet.technologies.opensource.reactive.todolist.rest.api;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
