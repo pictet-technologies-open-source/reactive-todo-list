@@ -115,7 +115,7 @@ public class ItemControllerIntegrationTest {
 //        final NewItemResource itemResource = new NewItemResource().setDescription("New");
 //
 //        // When
-//        String location = webTestClient.post()
+//        final String location = webTestClient.post()
 //                .uri(URI)
 //                .bodyValue(itemResource)
 //                .exchange()
@@ -193,7 +193,7 @@ public class ItemControllerIntegrationTest {
 //                .bodyValue(itemResource)
 //                .exchange()
 //                // Then
-//                .expectStatus().isOk();
+//                .expectStatus().isNoContent();
 //
 //        final Item updatedItem = itemRepository.findById(item.getId()).block();
 //        assertNotNull(updatedItem);
@@ -240,7 +240,7 @@ public class ItemControllerIntegrationTest {
 //                .header(IF_MATCH, "1")
 //                .exchange()
 //                // Then
-//                .expectStatus().isOk();
+//                .expectStatus().isNoContent();
 //
 //        final Item updatedItem = itemRepository.findById(item.getId()).block();
 //        assertNotNull(updatedItem);
@@ -360,7 +360,7 @@ public class ItemControllerIntegrationTest {
 //                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
 //                .exchange()
 //                // Then
-//                .expectStatus().isOk();
+//                .expectStatus().isNoContent();
 //
 //        final Item updatedItem = itemRepository.findById(item.getId()).block();
 //        assertNotNull(updatedItem);
@@ -400,7 +400,7 @@ public class ItemControllerIntegrationTest {
 //                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
 //                .exchange()
 //                // Then
-//                .expectStatus().isOk();
+//                .expectStatus().isNoContent();
 //
 //        final Item updatedItem = itemRepository.findById(item.getId()).block();
 //        assertNotNull(updatedItem);
