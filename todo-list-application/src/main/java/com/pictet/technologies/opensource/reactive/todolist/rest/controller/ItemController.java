@@ -21,6 +21,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.http.HttpHeaders.IF_MATCH;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.created;
+import static org.springframework.http.ResponseEntity.noContent;
 
 @RestController
 @RequestMapping(value = "/items")
@@ -41,7 +42,7 @@ public class ItemController {
 
     @ApiOperation("Update an existing item")
     @PutMapping(value = "/{id}")
-    public Mono<Void> update(@PathVariable @NotNull final String id,
+    public Mono<ResponseEntity<Void>> update(@PathVariable @NotNull final String id,
                              @Valid @RequestBody ItemUpdateResource itemUpdateResource) {
 
         // Find the item and update the instance
@@ -51,13 +52,13 @@ public class ItemController {
                     return item;
                 })
                 .flatMap(itemService::save)
-                .flatMap(item -> Mono.empty());
+                .map(item -> noContent().build());
     }
 
     @ApiOperation("Patch an existing item following the patch merge RCF (https://tools.ietf.org/html/rfc7396)")
     @PatchMapping(value = "/{id}")
     @SuppressWarnings({"OptionalAssignedToNull", "OptionalGetWithoutIsPresent"})
-    public Mono<Void> patch(@PathVariable @NotNull final String id,
+    public Mono<ResponseEntity<Void>> patch(@PathVariable @NotNull final String id,
                             @Valid @RequestBody ItemPatchResource patch) {
 
         return itemService.findById(id)
@@ -75,7 +76,7 @@ public class ItemController {
                     return item;
                 })
                 .flatMap(itemService::save)
-                .flatMap(item -> Mono.empty());
+                .map(item -> noContent().build());
     }
 
     @ApiOperation("Find an item by its id")
@@ -96,10 +97,11 @@ public class ItemController {
 
     @ApiOperation("Delete an item")
     @DeleteMapping("/{id}")
-    public Mono<Void> delete(@PathVariable final String id,
+    public Mono<ResponseEntity<Void>> delete(@PathVariable final String id,
                              @RequestHeader(name = IF_MATCH, required = false) Long version) {
 
-        return itemService.deleteById(id);
+        return itemService.deleteById(id)
+                .map(item -> noContent().build());
     }
 
 }
