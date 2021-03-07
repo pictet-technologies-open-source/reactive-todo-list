@@ -35,9 +35,9 @@ public class ItemController {
 
     @ApiOperation("Create a new item")
     @PostMapping
-    public ResponseEntity<Void> create(@Valid @RequestBody final NewItemResource item) {
+    public ResponseEntity<Void> create(@Valid @RequestBody final NewItemResource newItemResource) {
 
-        final String id = itemService.save(itemMapper.toModel(item)).getId();
+        final String id = itemService.save(itemMapper.toModel(newItemResource)).getId();
 
         return created(linkTo(ItemController.class).slash(id).toUri()).build();
     }
