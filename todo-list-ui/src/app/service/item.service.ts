@@ -30,7 +30,7 @@ export class ItemService {
   }
 
   addItem(description: string): Observable<any> {
-    return this.http.post<Item[]>(this.baseUrl, {description})
+    return this.http.post<Item>(this.baseUrl, {description})
       .pipe(take(1));
   }
 
