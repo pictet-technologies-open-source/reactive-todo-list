@@ -25,12 +25,32 @@ export class ItemService {
     };
   }
 
-  findAll(): Observable<Item[]> {
-    return this.http.get<Item[]>(this.baseUrl).pipe(take(1));
+  findAll(): Observable<Item> {
+    return new Observable<Item>((subscriber) => {
+
+      const eventSource = new EventSource(this.baseUrl);
+
+      // Process incoming messages
+      eventSource.onmessage = (event) => {
+        const item = JSON.parse(event.data);
+        this.ngZone.run(() => subscriber.next(item));
+      };
+
+      // Handle error
+      eventSource.onerror = (error) => {
+        if (eventSource.readyState === 0) {
+            // The connection has been closed by the server
+            eventSource.close();
+            subscriber.complete();
+        } else {
+          subscriber.error(error);
+        }
+      };
+    });
   }
 
   addItem(description: string): Observable<any> {
-    return this.http.post<Item[]>(this.baseUrl, {description})
+    return this.http.post<Item>(this.baseUrl, {description})
       .pipe(take(1));
   }
 

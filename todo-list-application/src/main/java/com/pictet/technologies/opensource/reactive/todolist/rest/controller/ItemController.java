@@ -9,6 +9,7 @@ import com.pictet.technologies.opensource.reactive.todolist.service.ItemService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -87,7 +88,7 @@ public class ItemController {
     }
 
     @ApiOperation("Get a the list of items")
-    @GetMapping(produces = APPLICATION_JSON_VALUE)
+    @GetMapping(produces = {MediaType.TEXT_EVENT_STREAM_VALUE})
     public Flux<ItemResource> getAllItems() {
 
         return itemService.findAll()

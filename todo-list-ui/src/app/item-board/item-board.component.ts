@@ -61,8 +61,8 @@ export class ItemBoardComponent implements OnInit, OnDestroy {
       .pipe(finalize(() => {
         this.stopActionInProgress();
       }))
-      .subscribe(items => {
-        items.forEach(item => this.statusItemsMap.get(item.status).push(item));
+      .subscribe(item => {
+        this.statusItemsMap.get(item.status).push(item);
       });
   }
 
