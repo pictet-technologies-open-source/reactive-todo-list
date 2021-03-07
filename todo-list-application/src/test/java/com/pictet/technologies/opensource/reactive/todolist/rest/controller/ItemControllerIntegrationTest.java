@@ -8,7 +8,6 @@ import com.pictet.technologies.opensource.reactive.todolist.rest.api.ItemUpdateR
 import com.pictet.technologies.opensource.reactive.todolist.rest.api.NewItemResource;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +16,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -27,7 +27,6 @@ import static org.springframework.http.HttpHeaders.IF_MATCH;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(SpringExtension.class)
 @DirtiesContext
-@Disabled
 public class ItemControllerIntegrationTest {
 
     private static final String URI = "/items/";
@@ -48,7 +47,7 @@ public class ItemControllerIntegrationTest {
     @BeforeEach
     @AfterEach
     public void cleanup() {
-        itemRepository.deleteAll();
+        itemRepository.deleteAll().block();
     }
 
     //-----------------------------------
@@ -78,12 +77,12 @@ public class ItemControllerIntegrationTest {
         // Given no items
         final Item item1 = itemRepository.save(
                 new Item().setStatus(ItemStatus.TODO)
-                        .setDescription("Item1"));
+                        .setDescription("Item1")).block();
         assertNotNull(item1);
 
         final Item item2 = itemRepository.save(
                 new Item().setStatus(ItemStatus.DONE)
-                        .setDescription("Item2"));
+                        .setDescription("Item2")).block();
         assertNotNull(item2);
 
         // When
@@ -114,19 +113,23 @@ public class ItemControllerIntegrationTest {
         final NewItemResource itemResource = new NewItemResource().setDescription("New");
 
         // When
-        webTestClient.post()
+        String location = webTestClient.post()
                 .uri(URI)
                 .bodyValue(itemResource)
                 .exchange()
                 // Then
-                .expectStatus().isOk()
-                .expectBody(ItemResource.class)
-                .value(item -> {
-                    assertNotNull(item);
-                    assertEquals(itemResource.getDescription(), item.getDescription());
-                    assertEquals(ItemStatus.TODO, item.getStatus());
-                    assertEquals(0L, item.getVersion());
-                });
+                .expectStatus().isCreated()
+                .expectHeader().valueMatches(HttpHeaders.LOCATION, "/items/[a-z0-9]+")
+                .returnResult(ResponseEntity.class).getResponseHeaders()
+                .get(HttpHeaders.LOCATION).get(0);
+
+        final String id = location.substring(location.lastIndexOf('/') + 1);
+
+        final Item createdItem = itemRepository.findById(id).block();
+        assertNotNull(createdItem);
+        assertEquals(itemResource.getDescription(), createdItem.getDescription());
+        assertEquals(ItemStatus.TODO, createdItem.getStatus());
+        assertEquals(0L, createdItem.getVersion());
     }
 
     @Test
@@ -149,7 +152,6 @@ public class ItemControllerIntegrationTest {
     //               Put
     //
     //-----------------------------------
-
     @Test
     void GIVEN_no_item_WHEN_trying_to_update_a_non_existing_item_THEN_an_error_is_returned() {
         // Given
@@ -174,7 +176,7 @@ public class ItemControllerIntegrationTest {
         // Given
         final Item item = itemRepository.save(new Item()
                 .setStatus(ItemStatus.DONE)
-                .setDescription("description"));
+                .setDescription("description")).block();
         assertNotNull(item);
 
         assertEquals(0L, item.getVersion());
@@ -189,15 +191,14 @@ public class ItemControllerIntegrationTest {
                 .bodyValue(itemResource)
                 .exchange()
                 // Then
-                .expectStatus().isOk()
-                .expectBody(ItemResource.class)
-                .value(updatedItem -> {
-                    assertEquals(itemResource.getDescription(), updatedItem.getDescription());
-                    assertEquals(itemResource.getStatus(), updatedItem.getStatus());
-                    assertEquals(1L, updatedItem.getVersion());
-                });
-    }
+                .expectStatus().isOk();
 
+        final Item updatedItem = itemRepository.findById(item.getId()).block();
+        assertNotNull(updatedItem);
+        assertEquals(itemResource.getDescription(), updatedItem.getDescription());
+        assertEquals(itemResource.getStatus(), updatedItem.getStatus());
+        assertEquals(1L, updatedItem.getVersion());
+    }
 
     @Test
     void testOptimisticLockingPut_preconditionFailed() throws Exception {
@@ -237,14 +238,14 @@ public class ItemControllerIntegrationTest {
                 .header(IF_MATCH, "1")
                 .exchange()
                 // Then
-                .expectStatus().isOk()
-                .expectBody(ItemResource.class)
-                .value(updatedItem -> {
-                    assertEquals(2L, updatedItem.getVersion());
-                    assertEquals(itemUpdateResource.getDescription(), updatedItem.getDescription());
-                });
+                .expectStatus().isOk();
 
+        final Item updatedItem = itemRepository.findById(item.getId()).block();
+        assertNotNull(updatedItem);
+        assertEquals(2L, updatedItem.getVersion());
+        assertEquals(itemUpdateResource.getDescription(), updatedItem.getDescription());
     }
+
 
     //-----------------------------------
     //
@@ -262,14 +263,13 @@ public class ItemControllerIntegrationTest {
                 .expectStatus().isNotFound();
     }
 
-
     @Test
     void GIVEN_an_item_WHEN_deleting_it_THEN_it_is_deleted() throws Exception {
 
         // Given
         final Item item = itemRepository.save(new Item()
                 .setStatus(ItemStatus.DONE)
-                .setDescription("description"));
+                .setDescription("description")).block();
         assertNotNull(item);
 
         // When deleting it
@@ -287,13 +287,14 @@ public class ItemControllerIntegrationTest {
                 .expectStatus().isNotFound();
     }
 
+
     @Test
     void testOptimisticLockingDelete_preconditionFailed() throws Exception {
 
         // Given
         final Item item = itemRepository.save(new Item()
                 .setStatus(ItemStatus.DONE)
-                .setDescription("description"));
+                .setDescription("description")).block();
         assertNotNull(item);
 
         // When
@@ -311,7 +312,7 @@ public class ItemControllerIntegrationTest {
         // Given
         final Item item = itemRepository.save(new Item()
                 .setStatus(ItemStatus.DONE)
-                .setDescription("description"));
+                .setDescription("description")).block();
         assertNotNull(item);
 
         // When
@@ -347,7 +348,7 @@ public class ItemControllerIntegrationTest {
         // Given
         final Item item = itemRepository.save(new Item()
                 .setStatus(ItemStatus.DONE)
-                .setDescription("description"));
+                .setDescription("description")).block();
         assertNotNull(item);
 
         // When
@@ -357,13 +358,13 @@ public class ItemControllerIntegrationTest {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .exchange()
                 // Then
-                .expectStatus().isOk()
-                .expectBody(ItemResource.class)
-                .value(updatedItem -> {
-                    assertEquals("updated", updatedItem.getDescription());
-                    assertEquals(ItemStatus.DONE, updatedItem.getStatus());
-                    assertEquals(1L, updatedItem.getVersion());
-                });
+                .expectStatus().isOk();
+
+        final Item updatedItem = itemRepository.findById(item.getId()).block();
+        assertNotNull(updatedItem);
+        assertEquals("updated", updatedItem.getDescription());
+        assertEquals(ItemStatus.DONE, updatedItem.getStatus());
+        assertEquals(1L, updatedItem.getVersion());
     }
 
     @Test
@@ -397,12 +398,12 @@ public class ItemControllerIntegrationTest {
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .exchange()
                 // Then
-                .expectStatus().isOk()
-                .expectBody(ItemResource.class)
-                .value(updatedItem -> {
-                    assertEquals(2L, updatedItem.getVersion());
-                    assertEquals("updated", updatedItem.getDescription());
-                });
+                .expectStatus().isOk();
+
+        final Item updatedItem = itemRepository.findById(item.getId()).block();
+        assertNotNull(updatedItem);
+        assertEquals(2L, updatedItem.getVersion());
+        assertEquals("updated", updatedItem.getDescription());
     }
 
     //-----------------------------------
@@ -413,11 +414,11 @@ public class ItemControllerIntegrationTest {
     private Item createItemWithTwoRevisions() {
         Item item = itemRepository.save(new Item()
                 .setStatus(ItemStatus.DONE)
-                .setDescription("description"));
+                .setDescription("description")).block();
         assertNotNull(item);
         assertEquals(0L, item.getVersion());
 
-        item = itemRepository.save(item.setDescription("description version 1"));
+        item = itemRepository.save(item.setDescription("description version 1")).block();
         assertNotNull(item);
         assertEquals(1L, item.getVersion());
         return item;

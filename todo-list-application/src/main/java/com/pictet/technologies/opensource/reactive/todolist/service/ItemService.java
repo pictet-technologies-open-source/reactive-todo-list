@@ -6,8 +6,8 @@ import com.pictet.technologies.opensource.reactive.todolist.repository.ItemRepos
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
@@ -17,23 +17,26 @@ public class ItemService {
 
     private final ItemRepository itemRepository;
 
-    public List<Item> findAll() {
+    public Flux<Item> findAll() {
         return itemRepository.findAll(DEFAULT_SORT);
     }
 
+    public Mono<Item> save(final Item item) {
 
-    public Item save(final Item item) {
         if(item.getId() != null) {
             // Update
-            verifyExistence(item.getId());
+            return verifyExistence(item.getId())
+                    .flatMap(exists -> itemRepository.save(item));
         }
+
+        // Create
         return itemRepository.save(item);
     }
 
-    public void deleteById(final String id) {
+    public Mono<Void> deleteById(final String id) {
 
-        verifyExistence(id);
-        itemRepository.deleteById(id);
+        return verifyExistence(id)
+                .flatMap(exists -> itemRepository.deleteById(id));
     }
 
     /**
@@ -43,16 +46,21 @@ public class ItemService {
      * @return the item
      * @throws ItemNotFoundException if the item with the provided identifier does not exist
      */
-    public Item findById(final String id) {
+    public Mono<Item> findById(final String id) {
 
         return itemRepository.findById(id)
-                .orElseThrow(() -> new ItemNotFoundException(id));
+                .switchIfEmpty(Mono.error(new ItemNotFoundException(id)));
     }
 
-    private void verifyExistence(String id) {
-        if(! itemRepository.existsById(id)) {
-            throw new ItemNotFoundException(id);
-        }
+    private Mono<Boolean> verifyExistence(String id) {
+
+        return itemRepository.existsById(id).handle((exists, sink) -> {
+            if (! exists) {
+                sink.error(new ItemNotFoundException(id));
+            } else {
+                sink.next(true);
+            }
+        });
     }
 
 }

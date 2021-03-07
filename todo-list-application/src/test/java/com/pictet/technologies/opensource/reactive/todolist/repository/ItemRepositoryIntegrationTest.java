@@ -34,13 +34,13 @@ public class ItemRepositoryIntegrationTest {
     public void testOptimisticLockingWithMongo() {
 
         // Given
-        Item existingItem = itemRepository.save(new Item().setDescription("Walk the dog").setStatus(ItemStatus.TODO));
+        Item existingItem = itemRepository.save(new Item().setDescription("Walk the dog").setStatus(ItemStatus.TODO)).block();
         assertNotNull(existingItem);
 
         assertEquals(0, existingItem.getVersion());
 
         existingItem.setDescription("Walk the dog in the park");
-        existingItem = itemRepository.save(existingItem);
+        existingItem = itemRepository.save(existingItem).block();
         assertNotNull(existingItem);
 
         assertEquals(1, existingItem.getVersion());
