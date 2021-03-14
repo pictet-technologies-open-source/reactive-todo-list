@@ -44,10 +44,11 @@ public class ItemController {
     @ApiOperation("Update an existing item")
     @PutMapping(value = "/{id}")
     public Mono<ResponseEntity<Void>> update(@PathVariable @NotNull final String id,
+                             @RequestHeader(name = IF_MATCH, required = false) Long version,
                              @Valid @RequestBody ItemUpdateResource itemUpdateResource) {
 
         // Find the item and update the instance
-        return itemService.findById(id)
+        return itemService.findById(id, version)
                 .map(item -> {
                     itemMapper.update(itemUpdateResource, item);
                     return item;
@@ -60,9 +61,10 @@ public class ItemController {
     @PatchMapping(value = "/{id}")
     @SuppressWarnings({"OptionalAssignedToNull", "OptionalGetWithoutIsPresent"})
     public Mono<ResponseEntity<Void>> patch(@PathVariable @NotNull final String id,
+                            @RequestHeader(name = IF_MATCH, required = false) Long version,
                             @Valid @RequestBody ItemPatchResource patch) {
 
-        return itemService.findById(id)
+        return itemService.findById(id, version)
                 .map(item -> {
                     if (patch.getDescription() != null) {
                         // The description has been provided in the patch
@@ -84,7 +86,7 @@ public class ItemController {
     @GetMapping(value = "/{id}", produces = {APPLICATION_JSON_VALUE})
     public Mono<ItemResource> findById(@PathVariable String id) {
 
-        return itemService.findById(id).map(itemMapper::toResource);
+        return itemService.findById(id, null).map(itemMapper::toResource);
     }
 
     @ApiOperation("Get a the list of items")
@@ -100,7 +102,7 @@ public class ItemController {
     public Mono<ResponseEntity<Void>> delete(@PathVariable final String id,
                              @RequestHeader(name = IF_MATCH, required = false) Long version) {
 
-        return itemService.deleteById(id)
+        return itemService.deleteById(id, version)
                 .map(item -> noContent().build());
     }
 

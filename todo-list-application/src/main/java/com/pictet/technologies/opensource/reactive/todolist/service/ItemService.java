@@ -1,6 +1,7 @@
 package com.pictet.technologies.opensource.reactive.todolist.service;
 
 import com.pictet.technologies.opensource.reactive.todolist.exception.ItemNotFoundException;
+import com.pictet.technologies.opensource.reactive.todolist.exception.UnexpectedItemVersionException;
 import com.pictet.technologies.opensource.reactive.todolist.model.Item;
 import com.pictet.technologies.opensource.reactive.todolist.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,29 +34,39 @@ public class ItemService {
         return itemRepository.save(item);
     }
 
-    public Mono<Void> deleteById(final String id) {
+    public Mono<Void> deleteById(final String id, final Long version) {
 
-        return verifyExistence(id)
-                .flatMap(exists -> itemRepository.deleteById(id));
+        return findById(id, version)
+                .flatMap(itemRepository::delete);
     }
 
     /**
      * Find an item
      *
      * @param id identifier of the item
+     * @param version expected version of the item
+     *
      * @return the item
      * @throws ItemNotFoundException if the item with the provided identifier does not exist
+     * @throws UnexpectedItemVersionException if the actual version is different from the actual one
      */
-    public Mono<Item> findById(final String id) {
+    public Mono<Item> findById(final String id, final Long version) {
 
         return itemRepository.findById(id)
-                .switchIfEmpty(Mono.error(new ItemNotFoundException(id)));
+                .switchIfEmpty(Mono.error(new ItemNotFoundException(id)))
+                .handle((item, sink) -> {
+                    if(version != null && ! item.getVersion().equals(version)) {
+                        sink.error(new UnexpectedItemVersionException(version, item.getVersion()));
+                    } else {
+                        sink.next(item);
+                    }
+                });
     }
 
     private Mono<Boolean> verifyExistence(String id) {
 
         return itemRepository.existsById(id).handle((exists, sink) -> {
-            if (! exists) {
+            if (Boolean.FALSE.equals(exists)) {
                 sink.error(new ItemNotFoundException(id));
             } else {
                 sink.next(true);
