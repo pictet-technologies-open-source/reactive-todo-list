@@ -51,7 +51,7 @@ public class ItemService {
     public Flux<Event> listenToEvents() {
         final ChangeStreamOptions changeStreamOptions = ChangeStreamOptions.builder()
                 .returnFullDocumentOnUpdate()
-                .filter(Aggregation.newAggregation(ItemResource.class,
+                .filter(Aggregation.newAggregation(Item.class,
                         Aggregation.match(Criteria.where("operationType")
                                 .in(OperationType.INSERT.getValue(),
                                     OperationType.REPLACE.getValue(),
