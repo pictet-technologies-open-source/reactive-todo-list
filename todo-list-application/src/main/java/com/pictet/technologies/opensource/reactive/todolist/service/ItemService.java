@@ -1,11 +1,19 @@
 package com.pictet.technologies.opensource.reactive.todolist.service;
 
+import com.mongodb.client.model.changestream.OperationType;
 import com.pictet.technologies.opensource.reactive.todolist.exception.ItemNotFoundException;
 import com.pictet.technologies.opensource.reactive.todolist.exception.UnexpectedItemVersionException;
 import com.pictet.technologies.opensource.reactive.todolist.model.Item;
 import com.pictet.technologies.opensource.reactive.todolist.repository.ItemRepository;
+import com.pictet.technologies.opensource.reactive.todolist.rest.api.ItemResource;
+import com.pictet.technologies.opensource.reactive.todolist.rest.api.event.Event;
+import com.pictet.technologies.opensource.reactive.todolist.mapper.ItemMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.ChangeStreamOptions;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -17,6 +25,8 @@ public class ItemService {
     private static final Sort DEFAULT_SORT = Sort.by(Sort.Order.by("lastModifiedDate"));
 
     private final ItemRepository itemRepository;
+    private final ItemMapper itemMapper;
+    private final ReactiveMongoTemplate reactiveMongoTemplate;
 
     public Flux<Item> findAll() {
         return itemRepository.findAll(DEFAULT_SORT);
@@ -61,6 +71,22 @@ public class ItemService {
                         sink.next(item);
                     }
                 });
+    }
+
+    public Flux<Event> listenToEvents() {
+
+        final ChangeStreamOptions changeStreamOptions = ChangeStreamOptions.builder()
+                .returnFullDocumentOnUpdate()
+                .filter(Aggregation.newAggregation(Item.class,
+                        Aggregation.match(Criteria.where("operationType")
+                                .in(OperationType.INSERT.getValue(),
+                                        OperationType.REPLACE.getValue(),
+                                        OperationType.UPDATE.getValue(),
+                                        OperationType.DELETE.getValue()))))
+                .build();
+
+        return reactiveMongoTemplate.changeStream("item", changeStreamOptions, Item.class)
+                .map(itemMapper::toEvent);
     }
 
     private Mono<Boolean> verifyExistence(String id) {

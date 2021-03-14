@@ -4,7 +4,6 @@ import com.pictet.technologies.opensource.reactive.todolist.model.Item;
 import com.pictet.technologies.opensource.reactive.todolist.model.ItemStatus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 @DirtiesContext
-@Disabled
 public class ItemRepositoryIntegrationTest {
 
     @Autowired
@@ -50,7 +48,7 @@ public class ItemRepositoryIntegrationTest {
                 .setVersion(0L)
                 .setDescription("Walk the dog by the river");
 
-            assertThrows(OptimisticLockingFailureException.class, () -> itemRepository.save(itemToUpdate));
+            assertThrows(OptimisticLockingFailureException.class, () -> itemRepository.save(itemToUpdate).block());
     }
 
 }

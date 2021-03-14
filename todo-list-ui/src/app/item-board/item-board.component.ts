@@ -19,6 +19,7 @@ export class ItemBoardComponent implements OnInit, OnDestroy {
   statusItemsMap = new Map<string, Item[]>();
   actionInProgress = false;
   dragAndDropInProgress = false;
+  private eventSource: EventSource;
 
   constructor(private readonly itemService: ItemService,
               private readonly changeDetector: ChangeDetectorRef,
@@ -140,11 +141,25 @@ export class ItemBoardComponent implements OnInit, OnDestroy {
   }
 
   private startEventListener() {
-    // TODO listen to all events
+    // Listen to all changes
+    this.eventSource = this.itemService.listenToEvents(
+      (e) => this.onItemSaved(e),
+      (e) => this.onItemDeleted(e));
   }
 
   private stopEventListener() {
-    // TODO
+    this.eventSource.close();
   }
 
+  private onItemDeleted(event: any) {
+    this.removeItem(event.itemId);
+  }
+
+  private onItemSaved(event: any) {
+    const item = event.item;
+    this.removeItem(item.id);
+
+    // Add it to the correct status column
+    this.statusItemsMap.get(item.status).push(item);
+  }
 }

@@ -68,4 +68,31 @@ export class ItemService {
     return this.http.patch<void>(`${this.baseUrl}/${id}`, {status}, ItemService.buildOptions(version));
   }
 
+  listenToEvents(onSaved: (event) => void, onDeleted: (event) => void): EventSource {
+    const eventSource = new EventSource(`${this.baseUrl}/events`);
+
+    // Handle the creation and the update of items
+    eventSource.addEventListener('ItemSaved', (event: MessageEvent) => {
+      onSaved(JSON.parse(event.data));
+    });
+
+    // Handle the deletion of items
+    eventSource.addEventListener('ItemDeleted', (event: MessageEvent) => {
+      onDeleted(JSON.parse(event.data));
+    });
+
+    // Handle errors
+    eventSource.onerror = (error) => {
+      if (eventSource.readyState === 0) {
+        // The connection has been closed
+        // We should not close the eventSource in order to allow the automatic reconnection
+        console.error('Stream closed');
+      } else {
+        console.error(error);
+      }
+    };
+
+    return eventSource;
+  }
+
 }
