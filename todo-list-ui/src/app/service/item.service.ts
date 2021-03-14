@@ -4,7 +4,6 @@ import {Item} from '../model/item';
 import {Observable} from 'rxjs';
 import {ItemStatus} from '../model/item-status.enum';
 import {environment} from '../../environments/environment';
-import {take} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
