@@ -21,36 +21,35 @@ import static org.junit.jupiter.api.Assertions.*;
 @Disabled
 public class ItemRepositoryIntegrationTest {
 
-    @Autowired
-    private ItemRepository itemRepository;
-
-    @BeforeEach
-    @AfterEach
-    public void cleanup() {
-        itemRepository.deleteAll();
-    }
-
-    @Test
-    public void testOptimisticLockingWithMongo() {
-
-        // Given
-        Item existingItem = itemRepository.save(new Item().setDescription("Walk the dog").setStatus(ItemStatus.TODO));
-        assertNotNull(existingItem);
-
-        assertEquals(0, existingItem.getVersion());
-
-        existingItem.setDescription("Walk the dog in the park");
-        existingItem = itemRepository.save(existingItem);
-        assertNotNull(existingItem);
-
-        assertEquals(1, existingItem.getVersion());
-
-        // When / Then
-        final Item itemToUpdate = new Item().setId(existingItem.getId())
-                .setVersion(0L)
-                .setDescription("Walk the dog by the river");
-
-            assertThrows(OptimisticLockingFailureException.class, () -> itemRepository.save(itemToUpdate));
-    }
+//    @Autowired
+//    private ItemRepository itemRepository;
+//
+//    @BeforeEach
+//    @AfterEach
+//    public void cleanup() {
+//        itemRepository.deleteAll();
+//    }
+//    @Test
+//    public void testOptimisticLockingWithMongo() {
+//
+//        // Given
+//        Item existingItem = itemRepository.save(new Item().setDescription("Walk the dog").setStatus(ItemStatus.TODO));
+//        assertNotNull(existingItem);
+//
+//        assertEquals(0, existingItem.getVersion());
+//
+//        existingItem.setDescription("Walk the dog in the park");
+//        existingItem = itemRepository.save(existingItem);
+//        assertNotNull(existingItem);
+//
+//        assertEquals(1, existingItem.getVersion());
+//
+//        // When / Then
+//        final Item itemToUpdate = new Item().setId(existingItem.getId())
+//                .setVersion(0L)
+//                .setDescription("Walk the dog by the river");
+//
+//            assertThrows(OptimisticLockingFailureException.class, () -> itemRepository.save(itemToUpdate).block());
+//    }
 
 }
