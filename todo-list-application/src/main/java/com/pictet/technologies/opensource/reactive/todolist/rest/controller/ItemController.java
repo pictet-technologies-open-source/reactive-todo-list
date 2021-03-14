@@ -5,7 +5,7 @@ import com.pictet.technologies.opensource.reactive.todolist.rest.api.ItemPatchRe
 import com.pictet.technologies.opensource.reactive.todolist.rest.api.ItemResource;
 import com.pictet.technologies.opensource.reactive.todolist.rest.api.ItemUpdateResource;
 import com.pictet.technologies.opensource.reactive.todolist.rest.api.NewItemResource;
-import com.pictet.technologies.opensource.reactive.todolist.rest.mapper.ItemMapper;
+import com.pictet.technologies.opensource.reactive.todolist.mapper.ItemMapper;
 import com.pictet.technologies.opensource.reactive.todolist.service.ItemService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
