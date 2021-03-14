@@ -6,7 +6,7 @@
 
 # Reactive Todo List 
 
-This project aims to explain how to build a fully reactive application with Spring Boot, Spring Webflux, Angular and MongoDB.
+This project aims to explain how to build a fully reactive web application with Spring Boot, Spring WebFlux, Angular and MongoDB.
 It demonstrates how to deal with concurrent modifications using optimistic locking, Change Streams and Server Sent Events.
 
 <p align="center">
@@ -77,7 +77,7 @@ Ensure that the URL of the application has been correctly configured in the foll
 todo-list-ui/src/app/environments/environment.prod.ts
 ```
 
-Then build the application in production mode.
+Then build the application in production mode. To do so, go the the root folder and execute the following command.
 
 ```
 $ mvnw clean install -Pprod
