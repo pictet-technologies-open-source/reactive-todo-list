@@ -1,11 +1,11 @@
 package com.pictet.technologies.opensource.reactive.todolist.rest.controller;
 
+import com.pictet.technologies.opensource.reactive.todolist.model.Item;
 import com.pictet.technologies.opensource.reactive.todolist.rest.api.ItemPatchResource;
 import com.pictet.technologies.opensource.reactive.todolist.rest.api.ItemResource;
 import com.pictet.technologies.opensource.reactive.todolist.rest.api.ItemUpdateResource;
 import com.pictet.technologies.opensource.reactive.todolist.rest.api.NewItemResource;
 import com.pictet.technologies.opensource.reactive.todolist.rest.mapper.ItemMapper;
-import com.pictet.technologies.opensource.reactive.todolist.model.Item;
 import com.pictet.technologies.opensource.reactive.todolist.service.ItemService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.http.HttpHeaders.IF_MATCH;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.ResponseEntity.created;
 import static org.springframework.http.ResponseEntity.noContent;
@@ -98,8 +97,7 @@ public class ItemController {
 
     @ApiOperation("Delete an item")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable final String id,
-                             @RequestHeader(name = IF_MATCH, required = false) Long version) {
+    public ResponseEntity<Void> delete(@PathVariable final String id) {
 
         itemService.deleteById(id);
         return noContent().build();
