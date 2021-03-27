@@ -77,7 +77,7 @@ public class ItemService {
 
         final ChangeStreamOptions changeStreamOptions = ChangeStreamOptions.builder()
                 .returnFullDocumentOnUpdate()
-                .filter(Aggregation.newAggregation(Item.class,
+                .filter(Aggregation.newAggregation(
                         Aggregation.match(Criteria.where("operationType")
                                 .in(OperationType.INSERT.getValue(),
                                         OperationType.REPLACE.getValue(),
