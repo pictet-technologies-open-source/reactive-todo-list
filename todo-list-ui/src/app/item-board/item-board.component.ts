@@ -62,7 +62,7 @@ export class ItemBoardComponent implements OnInit, OnDestroy {
         this.stopActionInProgress();
       }))
       .subscribe(items => {
-        items.forEach(item => this.statusItemsMap.get(item.status).push(item));
+        items.forEach(item => this.addItem(item));
       });
   }
 
@@ -127,6 +127,10 @@ export class ItemBoardComponent implements OnInit, OnDestroy {
 
   stopDragAction() {
     this.dragAndDropInProgress = false;
+  }
+
+  private addItem(item: Item) {
+    this.statusItemsMap.get(item.status).push(item);
   }
 
   private removeItem(itemId: string) {
